@@ -1,19 +1,29 @@
-import React,{useState,useEffect} from "react";
+import React,{useState} from "react";
 import Stock from "./Stock";
 
-function PortfolioContainer(data) {
+function PortfolioContainer({ portfolio = [],delstock }) {
 
-  const[fix,setfix] = useState([data])
-  
-   
+  const [myPortfolio,setMyPortfolio] = useState(portfolio)
+
+
+  // function delstock(name,ticker,price){
+  //   console.log(name)
+  //   // const deletedportfolio = portfolio.filter((data)=>data.nameame !== name)
+    
+  // }
+
   return (
     <div>
       <h2>My Portfolio</h2>
-      {
-        //render your portfolio stocks here
-      }
-      
-      {fix.map((data,index)=><Stock key={index} name={data.name} price={data.price} ticker={data.ticker} />)}
+      {portfolio.map(stock => (
+        <Stock
+          key={stock.id}
+          name={stock.name}
+          price={stock.price}
+          ticker={stock.ticker}
+          onStockClick={delstock}
+        />
+      ))}
     </div>
   );
 }

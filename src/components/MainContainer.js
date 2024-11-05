@@ -1,34 +1,69 @@
-import React,{useState} from "react";
+import React, { useState,useEffect } from "react";
 import StockContainer from "./StockContainer";
 import PortfolioContainer from "./PortfolioContainer";
 import SearchBar from "./SearchBar";
 
 function MainContainer() {
+  const [portfolio, setPortfolio] = useState([]);
 
-  const [portfolio,setPortfolio] = useState([])
+  const [stockData, setStockData] = useState([]);
 
-  function tomain(name,ticker,price){
-    console.log(name)
-     const newarr = [...portfolio,{
-      name:name,
-      price:price,
-      ticker:ticker
-    }]
-    setPortfolio(newarr)
-  
+  useEffect(() => {
+    fetch(`http://localhost:3001/stocks`)
+      .then(resp => resp.json())
+      .then(data => setStockData(data));
+  }, []);
 
+
+  function tomain(name, ticker, price) {
+    setPortfolio(prevPortfolio => [
+      ...prevPortfolio,
+      {
+        name,
+        price,
+        ticker,
+        id: Date.now() // Add unique id for key prop
+      }
+    ]);
   }
+
+ function delstock(name,){
+const deletedportfolio = portfolio.filter((data)=>{ return data.name !== name})
+     setPortfolio(deletedportfolio)
+     }
+
+function sortStock(sort){
+  let processedData = [...stockData];
+  console.log(sort)
+  
+  if(sort == "A"){
+    processedData.sort((a, b) => a.name.localeCompare(b.name))
+  }
+  if(sort == "P"){
+    processedData.sort((a, b) => a.price - b.price)
+  }
+
+  setStockData(processedData)
+
+}
+function handleFilter(e){
+  console.log(e)
+  //let processedData = [...stockData];
+  let processedData= stockData.filter((data)=>{return data.type == e})
+  setStockData(processedData)
+  
+}
+
 
   return (
     <div>
-      <SearchBar />
+      <SearchBar sortStock={sortStock} handleFilter={handleFilter}/>
       <div className="row">
         <div className="col-8">
-          <StockContainer tomain={tomain}/>
+          <StockContainer tomain={tomain} stockData={stockData} />
         </div>
         <div className="col-4">
-          <PortfolioContainer data={portfolio}/>
-          {/* {portfolio.map((data,index)=><PortfolioContainer  key={index} name={data.name} price={data.price} ticker={data.ticker}/>)} */}
+          <PortfolioContainer portfolio={portfolio} delstock={delstock} />
         </div>
       </div>
     </div>
